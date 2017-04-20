@@ -16,3 +16,9 @@ class Graph:
 
     def fetchNode(self):
         pass
+
+    def getEdge(self, fromNode, toNode):
+        pass
+
+    def getEdgeCost(self, edge):
+        pass

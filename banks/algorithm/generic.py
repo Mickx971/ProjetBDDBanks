@@ -19,8 +19,3 @@ class GenericBANKS:
             djisk.findRoots()
             djisk.constructTrees()
         return djisk.getTrees()
-
-
-if __name__ == '__main__':
-    searchEngine = GenericBANKS()
-    searchEngine.search(["1", "3", "4"], None)
