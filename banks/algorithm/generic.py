@@ -15,13 +15,10 @@ class GenericBANKS:
 
     def search(self, keywords, nbResult):
         djisk = self.createSearchIterator(keywords)
-        roots = set()
-        while djisk.next() and len(roots) <= nbResult:
-            roots.add(djisk.getRoots())
-        return self.constructTrees(roots, keywords)
-
-    def constructTrees(self, keywords):
-        pass
+        while djisk.next() and djisk.getNbRoots() <= nbResult:
+            djisk.findRoots()
+            djisk.constructTrees()
+        return djisk.getTrees()
 
 
 if __name__ == '__main__':
