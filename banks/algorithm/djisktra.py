@@ -1,34 +1,41 @@
 import sys
 
-class DjisktraIterator:
 
-    class InnerIterator:
-        def __init__(self, keyword, initialNode, masterIterator):
+class BANKSIterator:
+
+    class DjisktraIterator:
+        def __init__(self, keyword, initialNode, nbTuples, graph):
             self.keyword = keyword
             self.initialNode = initialNode
-            self.visited = {initialNode: 0}
-            self.path = {}
-            self.masterIterator = masterIterator
+            self.reached = {initialNode: 0}
+            self.shortestPathsTree = {}
+            self.nbTuples = nbTuples
+            self.graph = graph
+            self.traversed = set()
 
         def next(self):
-            if len(self.visited) == self.masterIterator.nbTuples:
+            if len(self.reached) == self.nbTuples:
                 return False
 
             minNode = None
-            for node in self.visited:
-                if minNode is None:
-                    minNode = node
-                elif self.visited[node] < self.visited[minNode]:
-                    minNode = node
+            for node in self.reached:
+                if node not in self.traversed:
+                    if minNode is None:
+                        minNode = node
+                    elif self.reached[node] < self.reached[minNode]:
+                        minNode = node
 
-            currentWeight = self.visited[minNode]
-            edges = self.masterIterator.graph.getEdgesFrom(minNode)
+            self.traversed.add(minNode)
 
-            for edge in edges:
-                weight = currentWeight + self.masterIterator.graph.getEdgeCost(edge)
-                if edge not in self.visited or weight < self.visited[edge]:
-                    self.visited[edge] = weight
-                    self.path[edge] = minNode
+            currentWeight = self.reached[minNode]
+            neighbours = self.graph.getNeighbours(minNode)
+
+            for n in neighbours:
+                edge = self.graph.getEdge(n, minNode)
+                weight = currentWeight + self.graph.getEdgeCost(edge)
+                if n not in self.reached or weight < self.reached[n]:
+                    self.reached[n] = weight
+                    self.shortestPathsTree[n] = minNode
 
             return True
 
@@ -40,18 +47,17 @@ class DjisktraIterator:
             self.leaves = leaves
 
     def __init__(self, graph, keywordNodes):
-        self.graph = graph
         self.keywordNodes = keywordNodes
         self.iterators = dict()
         self.roots = set()
         self.trees = list()
-        self.nbTuples = graph.getNbTuples()
+        nbTuples = graph.getNbTuples()
         for kw in self.keywordNodes.keys():
             for initialNode in self.keywordNodes[kw]:
-                self.iterators[initialNode] = self.InnerIterator(kw, initialNode)
+                self.iterators[initialNode] = self.DjisktraIterator(kw, initialNode, nbTuples, graph)
 
-    def next(self, default=False):
-        haveChanged = default
+    def next(self):
+        haveChanged = False
         for it in self.iterators.values():
             haveChanged = it.next() or haveChanged
         return haveChanged
@@ -62,26 +68,24 @@ class DjisktraIterator:
         for kw in self.keywordNodes.keys():
             keywordPaths[kw] = set()
             for initialNode in self.keywordNodes[kw]:
-                keywordPaths[kw].add(self.iterators[initialNode].path)
+                keywordPaths[kw].add(self.iterators[initialNode].reached.keys())
 
-        roots = self.graph.getNodes()
-        for paths in keywordPaths.values():
+        roots = keywordPaths.itervalues().next()
+        for paths in keywordPaths.itervalues():
             roots = roots & paths
 
         self.roots = roots
-        return roots
 
-    def getNbRoots(self):
-        return len(self.roots)
+    def getNbTrees(self):
+        return len(self.trees)
 
     def getKwIteratorsContainingNode(self, root):
         iterators = dict()
-        for itKey in self.iterators.values():
-            if root in self.iterators[itKey].path.values() or root == itKey:
-                kw = self.iterators[itKey].keyword
-                if iterators[kw] is None:
-                    iterators[kw] = list()
-                iterators[kw].append(self.iterators[itKey])
+        for it in self.iterators.iterkeys():
+            if root in it.reached.keys():
+                if iterators[it.keyword] is None:
+                    iterators[it.keyword] = list()
+                iterators[it.keyword].append(it)
         return iterators
 
     def computeNbTrees(self, kwIterators):
@@ -95,7 +99,7 @@ class DjisktraIterator:
     def getLeavesFromIterators(self, selectedIterators):
         leaves = set()
         for it in selectedIterators:
-            leaves.add(it.keyword)
+            leaves.add(it.initialNode)
         return leaves
 
     def isNewTree(self, root, selectedIterators):
@@ -117,19 +121,15 @@ class DjisktraIterator:
                     tree = self.Tree(root, self.getLeavesFromIterators(selectedIterators))
                     self.trees.append(tree)
                     for it in selectedIterators:
-                        self.mergePaths(tree, it.path.copy())
+                        self.mergePaths(tree, it.shortestPathsTree, it.initialNode, it.reached)
 
-    def mergePaths(self, tree, path):
+    def mergePaths(self, tree, shortestPathsTree, keywordNode, shortestPathsWeight):
         currentNode = tree.root
-        treePaths = tree.paths
-        while len(path) != 0:
-            nextNode = path.pop(currentNode)
-            if currentNode not in treePaths.keys():
-                treePaths[currentNode] = list()
-            edge = self.graph.getEdge(currentNode, nextNode)
-            tree.weight = tree.weight + self.graph.getEdgeCost(edge)
-            treePaths[currentNode].append(nextNode)
+        while currentNode != keywordNode:
+            nextNode = shortestPathsTree[currentNode]
+            tree.paths[nextNode] = nextNode
             currentNode = nextNode
+        tree.weight = tree.weight + shortestPathsWeight[tree.root]
 
     def getTrees(self):
         return self.trees

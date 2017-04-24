@@ -1,5 +1,5 @@
 from banks.neo4j.graph import Graph
-from banks.algorithm.djisktra import DjisktraIterator
+from banks.algorithm.djisktra import BANKSIterator
 
 
 class GenericBANKS:
@@ -11,11 +11,11 @@ class GenericBANKS:
         keywordNodes = dict()
         for kw in keywords:
             keywordNodes[kw] = self.graph.getKeywordNodes(kw)
-        return DjisktraIterator(self.graph, keywordNodes)
+        return BANKSIterator(self.graph, keywordNodes)
 
     def search(self, keywords, nbResult):
-        djisk = self.createSearchIterator(keywords)
-        while djisk.next() and djisk.getNbRoots() <= nbResult:
-            djisk.findRoots()
-            djisk.constructTrees()
-        return djisk.getTrees()
+        banksIt = self.createSearchIterator(keywords)
+        while banksIt.next() and banksIt.getNbTrees() <= nbResult:
+            banksIt.findRoots()
+            banksIt.constructTrees()
+        return banksIt.getTrees()
