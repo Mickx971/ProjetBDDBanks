@@ -1,4 +1,4 @@
-from banks.neo4j.graph import Graph
+from banks.database.graph import Graph
 from banks.algorithm.djisktra import BANKSIterator
 
 
