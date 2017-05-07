@@ -12,4 +12,11 @@ class Connector:
 
     def disconnect(self):
         self.session.close()
+        
+    def getSession(self):
+        return self.session
+
+    def run(self, statement):
+        for i in self.session.run(statement):
+            print i
 
