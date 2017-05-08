@@ -14,7 +14,8 @@ def transform_db():
 
     i = 0
     for edge in edges:
-        print i, "of 71000"
+        if i % 1000 == 0:
+            print i, "of 71000"
         connection.run(''.join(["match (a) where id(a) = ",str(edge["a"]),'''  
         match(b) where id(b) =''',str(edge["b"])," create (a)-[:",str(edge["type"]),\
                                 "{__weight__:a.__tempWeight__}]->(b)"]))
@@ -28,13 +29,19 @@ def transform_db():
     values = defaultdict(list)
     for node in nodes:
         for key in node["key"]:
-            values[node["n"][key]].append({"id": node["id"], "attr": key})
-            print i, "of 60000"
+            strKey = str(node["n"][key]) if isinstance(node["n"][key], int) else node["n"][key]
+            strKey = strKey.replace("\'", "\\\'")
+            values[strKey].append({"id": node["id"], "attr": key})
+
+            if i % 1000 == 0:
+                print i, "of 60000"
             i = i + 1
 
+    values.pop('', None)
 
     i = 0
     length = len(values)
+
     for key in values.iterkeys():
         i = i + 1
         statement = ''.join(["create (value:__value__{value:'", key, "'}) "])
@@ -48,14 +55,16 @@ def transform_db():
             variableName = "".join(["v", str(j)])
             subQueryNode.extend([variableName,"=NODE(", nodeId, "),"])
             subQueryMatch.extend([" match(", variableName, ') '])
-            subQueryCreate.extend([" create(value)-[:",\
-                                     node["attr"],"]->(", variableName, ") "])
+            subQueryCreate.extend([" create(value)-[:",node["attr"],"{value:'",key,"'}",\
+                                     "]->(", variableName, ") "])
         subQueryNode = ''.join(subQueryNode)
         subQueryMatch = ''.join(subQueryMatch)
         subQueryCreate = ''.join(subQueryCreate)
         subQueryNode = subQueryNode[:-1]
         query = ''.join(["start ",subQueryNode,subQueryMatch,statement,subQueryCreate])
-        print i, " of ", length
+
+        if i % 1000 == 0:
+            print "query: ",i, " of ", length
         connection.run(query)
 
 
