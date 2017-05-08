@@ -1,5 +1,5 @@
 from database.connector import Connector
-import time;
+from collections import defaultdict
 
 
 def transform_db():
@@ -12,47 +12,53 @@ def transform_db():
     connection.run("match (a) set a +={__tempWeight__:log(size(()-[]->(a))+1)}")
     edges = session.run('''match (b)-[c]->(a) return id(b) as b, type(c) as type, id(a) as a''')
 
+    i = 0
     for edge in edges:
-        print edge["a"], edge["b"], edge ["type"]
-        connection.run('''match (a) where id(a) = '''+str(edge["a"])+'''  
-        match(b) where id(b) ='''+str(edge["b"])+'''  create (a)-[:'''+str(edge["type"])+'''{__weight__:a.__tempWeight__}]->(b)''')
+        print i, "of 71000"
+        connection.run(''.join(["match (a) where id(a) = ",str(edge["a"]),'''  
+        match(b) where id(b) =''',str(edge["b"])," create (a)-[:",str(edge["type"]),\
+                                "{__weight__:a.__tempWeight__}]->(b)"]))
+        i = i+1
     connection.run("match(a) set a.__tempWeight__=null")
     nodes = session.run('''
             MATCH (n)
             return n, keys(n) as key, ID(n) as id
             ''')
-    temp = []
-    for node in nodes:
-        temp.append(node)
-
-    nodes = temp
-    temp = []
-
-    values = []
+    i = 0
+    values = defaultdict(list)
     for node in nodes:
         for key in node["key"]:
-            if not node["n"][str(key)] in values:
-                values.append(node["n"][str(key)])
+            values[node["n"][key]].append({"id": node["id"], "attr": key})
+            print i, "of 60000"
+            i = i + 1
+
 
     i = 0
-    for value in values:
-        statement = "create (value:__value__{value:'"+str(value)+"'}) "
-        i = i+1
-        for node in nodes:
-            if value in node["n"].values():
-                variableName = "v"+str(node["id"])
-                statement = "match("+variableName+") where ID("+variableName+") = " + str(node["id"]) + " " + statement
-                labels = ""
-                for key in node["key"]:
-                    if node["n"][str(key)] == value:
-                        labels = labels + ":" + str(key)
-                        statement = statement + "create (value) -[:"+str(key)+"]-> ("+variableName+") "
-        for i in session.run(statement):
-            print i
-        '''print statement
-        time.sleep(1)'''
+    length = len(values)
+    for key in values.iterkeys():
+        i = i + 1
+        statement = ''.join(["create (value:__value__{value:'", key, "'}) "])
+        subQueryNode = list()
+        subQueryMatch = list()
+        subQueryCreate = list()
+        j = 0
+        for node in values[key]:
+            j = j + 1
+            nodeId = str(node["id"])
+            variableName = "".join(["v", str(j)])
+            subQueryNode.extend([variableName,"=NODE(", nodeId, "),"])
+            subQueryMatch.extend([" match(", variableName, ') '])
+            subQueryCreate.extend([" create(value)-[:",\
+                                     node["attr"],"]->(", variableName, ") "])
+        subQueryNode = ''.join(subQueryNode)
+        subQueryMatch = ''.join(subQueryMatch)
+        subQueryCreate = ''.join(subQueryCreate)
+        subQueryNode = subQueryNode[:-1]
+        query = ''.join(["start ",subQueryNode,subQueryMatch,statement,subQueryCreate])
+        print i, " of ", length
+        connection.run(query)
 
-    del nodes
+
     connection.run("match(a) where not a:__value__ set a = {}")
     connection.run("match (a)-[edge]->() where a:__value__ set edge.__weight__ = 1")
 
