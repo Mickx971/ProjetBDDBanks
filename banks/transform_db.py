@@ -16,17 +16,12 @@ def transform_db():
         print edge["a"], edge["b"], edge ["type"]
         connection.run('''match (a) where id(a) = '''+str(edge["a"])+'''  
         match(b) where id(b) ='''+str(edge["b"])+'''  create (a)-[:'''+str(edge["type"])+'''{__weight__:a.__tempWeight__}]->(b)''')
+
     connection.run("match(a) set a.__tempWeight__=null")
     nodes = session.run('''
             MATCH (n)
             return n, keys(n) as key, ID(n) as id
             ''')
-    temp = []
-    for node in nodes:
-        temp.append(node)
-
-    nodes = temp
-    temp = []
 
     values = []
     for node in nodes:
@@ -34,10 +29,17 @@ def transform_db():
             if not node["n"][str(key)] in values:
                 values.append(node["n"][str(key)])
 
+
     i = 0
+    length = len(values)
     for value in values:
+        print i, 'of', length
         statement = "create (value:__value__{value:'"+str(value)+"'}) "
         i = i+1
+        nodes = session.run('''
+                        MATCH (n)
+                        return n, keys(n) as key, ID(n) as id
+                        ''')
         for node in nodes:
             if value in node["n"].values():
                 variableName = "v"+str(node["id"])
@@ -47,12 +49,11 @@ def transform_db():
                     if node["n"][str(key)] == value:
                         labels = labels + ":" + str(key)
                         statement = statement + "create (value) -[:"+str(key)+"]-> ("+variableName+") "
-        for i in session.run(statement):
-            print i
+        for j in session.run(statement):
+            print j
         '''print statement
         time.sleep(1)'''
 
-    del nodes
     connection.run("match(a) where not a:__value__ set a = {}")
     connection.run("match (a)-[edge]->() where a:__value__ set edge.__weight__ = 1")
 
