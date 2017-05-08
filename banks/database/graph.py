@@ -24,13 +24,6 @@ class Graph:
 
         return [] if (valueNode is None) else self.getNeighbours(valueNode)
 
-    def getNodes(self):
-        if self.nodes is None:
-            self.fetchNode()
-        return set(self.nodes)
-
-    def fetchNode(self):
-        pass
 
     def getEdge(self, fromNode, toNode):
         session = self.db.getSession()
@@ -43,6 +36,7 @@ class Graph:
         return edge
 
     def getEdgeCost(self, edge):
+        cost = None
         session = self.db.getSession()
         result = session.run("match()-[edge]->() where id(edge) = {edgeId} return edge",
                              {"edgeId": edge})
@@ -53,6 +47,7 @@ class Graph:
     def __getNumberOfNodes(self):
         session = self.db.getSession()
         result = session.run("match(a) where not a:__value__  return count(a) as nodeCount")
+        numberOfNodes = None
         for i in result:
             numberOfNodes = i["nodeCount"]
         return numberOfNodes
