@@ -19,3 +19,11 @@ class GenericBANKS:
             banksIt.findRoots()
             banksIt.constructTrees()
         return banksIt.getTrees()
+
+
+if __name__ == '__main__':
+    banks = GenericBANKS()
+    trees = banks.search(["cristopher", "dense"], 10)
+    for tree in trees:
+        tree.printTree()
+
