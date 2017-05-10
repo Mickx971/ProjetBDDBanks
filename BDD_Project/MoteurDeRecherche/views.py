@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import datetime
 import json
+from banks.database import graph
 
 graphs =""
 # Create your views here.
@@ -22,7 +23,7 @@ def search(request):
         # Code a ajouter pour faire une recherche dans La DB Graph
         # ..
         # ..
-        print keyword
+
     j = """{
     "nodes":[
         {"name":"keyword","group":1,"info":" la requeste chercher"},
@@ -40,8 +41,7 @@ def search(request):
 
 def graphI(request, id):
     global graphs
-    #graphs = request.session.get("graphs")
-    print graphs
+
     return HttpResponse(json.dumps(graphs[int(id)]), content_type="application/json")
 
 
@@ -61,5 +61,7 @@ def result(request):
     return HttpResponse(j, content_type="application/json")
 
 
-def getNoeudInfo(request):
-    return HttpResponse("information")
+def getNoeudInfo(request, idnode):
+    node = graph.Graph()
+    information = node.getNodeById(int(idnode))
+    return HttpResponse(json.dumps(information), content_type="application/json")
