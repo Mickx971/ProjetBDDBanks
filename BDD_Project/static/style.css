@@ -36,15 +36,15 @@ body{
 .right{
     float: right;
 }
+
 .information{
     width: 500px;
-    height: 500px;
+    padding-left: 20px;
     bottom: 0%;
     left: 0%;
-    border: 1px solid;
     position: fixed;
     float: left;
-
+    visibility: hidden;
 }
 /* -------------------- For Graph ------------------- */
 
