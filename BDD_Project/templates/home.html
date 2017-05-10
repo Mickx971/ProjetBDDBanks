@@ -28,9 +28,10 @@
                 </div>
             </form>
 
-
+            <div class="information"></div>
             <div id="result" >
                 <div id="graph">
+
 
                 </div>
 
@@ -50,6 +51,10 @@
         $(document).ready(function () {
             $("#KeyWordSearch").submit(getKeyword);
         });
+        
+        window.loadInformation = function () {
+            alert("test");
+        }
 
         function getKeyword() {
             $keyW = $("#keyword").val();
@@ -59,12 +64,15 @@
                 type: 'GET',
                 success: function ($data) {
                     document.getElementById("graph").innerHTML = "";
-                    creatGraph();
+                    for(i=0;i<$data;i++) {
+                        creatGraph(i);
+                    }
 
                 }
             });
             return false;
         }
+
     </script>
 
 </body>

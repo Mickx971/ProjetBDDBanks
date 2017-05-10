@@ -1,7 +1,7 @@
 /**
  * Created by chelalimohamed-tayeb on 08/05/2017.
  */
-function creatGraph() {
+function creatGraph(id) {
 
     var width = 960,
         height = 500
@@ -16,7 +16,7 @@ function creatGraph() {
         .charge(-100)
         .size([width, height]);
 
-    d3.json("/static/g.json", function (json) {
+    d3.json("/graphI/"+id, function (json) {
         force
             .nodes(json.nodes)
             .links(json.links)
@@ -64,6 +64,13 @@ function creatGraph() {
                 return "translate(" + d.x + "," + d.y + ")";
             });
         });
+         svg.selectAll(".node").on("click", function (d) {
+             console.log(d.name);
+             window.loadInformation();
+         })
     });
 
+
+
 }
+
