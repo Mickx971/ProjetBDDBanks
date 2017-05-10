@@ -8,6 +8,7 @@ import json
 from banks.database import graph
 
 graphs =""
+node = graph.Graph()
 # Create your views here.
 def home(request):
     temps = datetime.datetime.now()
@@ -17,6 +18,7 @@ def home(request):
 
 def search(request):
     global graphs
+    global node
     if 'key' in request.GET:
         keyword = request.GET.get('key', '') #ici on recupere la requette rechercher
 
@@ -36,6 +38,7 @@ def search(request):
         {"source":0,"target":2,"weight":3}
     ]
     }"""
+    #node.transformToClientStructure([[22,14], [10,13]])
     graphs = json.loads("["+j+","+j+"]")
     return HttpResponse(len(graphs), content_type="application/json")
 
@@ -62,6 +65,6 @@ def result(request):
 
 
 def getNoeudInfo(request, idnode):
-    node = graph.Graph()
+    global node
     information = node.getNodeById(int(idnode))
     return HttpResponse(json.dumps(information), content_type="application/json")

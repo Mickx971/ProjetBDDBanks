@@ -83,7 +83,7 @@ class Graph:
 
                 source = nodes.index({"id": result["source"]})
                 target = nodes.index({"id": result["target"]})
-                edges.append({"source": source , "target": target, "weight": 1, "name": result["type"]})
+                edges.append({"source": source , "target": target, "weight": 2, "name": result["type"]})
 
             transformedSolutions.append({"nodes": nodes, "links": edges})
 
