@@ -45,6 +45,12 @@ function creatGraph(id) {
             .text(function (d) {
                 return d.name
             });
+        link.append("text")
+            .attr("dx", 12)
+            .attr("dy", ".35em")
+            .text(function (d) {
+                return d.name
+            });
 
         force.on("tick", function () {
             link.attr("x1", function (d) {
@@ -74,6 +80,8 @@ function creatGraph(id) {
                 window.loadInformation(info);
             });
          })
+
+
     });
 
 

@@ -6,9 +6,11 @@ from django.http import HttpResponse
 import datetime
 import json
 from banks.database import graph
+from banks.algorithm.generic import GenericBANKS
 
 graphs =""
 node = graph.Graph()
+banks = GenericBANKS()
 # Create your views here.
 def home(request):
     temps = datetime.datetime.now()
@@ -19,6 +21,8 @@ def home(request):
 def search(request):
     global graphs
     global node
+    global banks
+    keyword=""
     if 'key' in request.GET:
         keyword = request.GET.get('key', '') #ici on recupere la requette rechercher
 
@@ -38,8 +42,10 @@ def search(request):
         {"source":0,"target":2,"weight":3}
     ]
     }"""
-    #node.transformToClientStructure([[22,14], [10,13]])
-    graphs = node.transformToClientStructure([[22,14], [10,13]])
+
+    trees = banks.search(keyword.split(), 10, strictDiff=True)
+    graphs = node.transformToClientStructure(trees)
+
     return HttpResponse(len(graphs), content_type="application/json")
 
 def graphI(request, id):
