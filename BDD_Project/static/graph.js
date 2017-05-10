@@ -64,9 +64,11 @@ function creatGraph(id) {
                 return "translate(" + d.x + "," + d.y + ")";
             });
         });
+
          svg.selectAll(".node").on("click", function (d) {
+             console.log(d)
             var info = {}
-            $.get("/getNodeInfo/6/", function(data){
+            $.get("/getNodeInfo/"+d.id, function(data){
                 console.log(data);
                 info = data;
                 window.loadInformation(info);
