@@ -45,6 +45,12 @@ function creatGraph(id) {
             .text(function (d) {
                 return d.name
             });
+        link.append("text")
+            .attr("dx", 12)
+            .attr("dy", ".35em")
+            .text(function (d) {
+                return d.name
+            });
 
         force.on("tick", function () {
             link.attr("x1", function (d) {
@@ -66,12 +72,14 @@ function creatGraph(id) {
         });
          svg.selectAll(".node").on("click", function (d) {
             var info = {}
-            $.get("/getNodeInfo/6/", function(data){
+            $.get("/getNodeInfo/"+d.id, function(data){
                 console.log(data);
                 info = data;
                 window.loadInformation(info);
             });
          })
+
+
     });
 
 
