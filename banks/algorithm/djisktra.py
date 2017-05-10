@@ -178,7 +178,7 @@ class BANKSIterator:
         for t in self.trees:
             tNodes = set(t.paths.keys())
             tNodes.add(t.root)
-            if len(tNodes - treeNodes) == 0:
+            if len(tNodes - treeNodes) == 0 or len(treeNodes - tNodes) == 0:
                 return False
         return True
 
