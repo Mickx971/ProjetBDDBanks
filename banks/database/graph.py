@@ -54,9 +54,59 @@ class Graph:
 
     def getNbTuples(self):
         return self.numberOfNodes
+
+    def getNodeById(self,id):
+        session = self.db.getSession()
+        results = session.run("""start n = Node({nodeId}) match (n)<-[edge]-(v) 
+        where v:__value__ return type(edge) as key, v.value as value""", {"nodeId": id})
+        node = {}
+        for result in results:
+            key = str(result["key"]) if isinstance(result["key"], int) else result["key"]
+            node[key] = result["value"]
+        return node
+
+    def transformToClientStructure(self, listOfSolutions):
+        transformedSolutions = []
+        session = self.db.getSession()
+        for solution in listOfSolutions:
+            resutls = session.run("""start r = rel({solution}) match (a)-[r]->(b) 
+            return id(a) as source,id(b) as target, id(r) as id, type(r) as type """,
+                                  {"solution": solution})
+            nodes = list()
+            edges = list()
+            for result in resutls:
+                if not {"id": result["source"]} in nodes:
+                    nodes.append({"id": result["source"]})
+
+                if not {"id": result["target"]} in nodes:
+                    nodes.append({"id": result["target"]})
+
+                source = nodes.index({"id": result["source"]})
+                target = nodes.index({"id": result["target"]})
+                edges.append({"source": source , "target": target, "weight": 2, "name": result["type"]})
+
+            transformedSolutions.append({"nodes": nodes, "links": edges})
+
+        interessedFields = [ "value","title", "name"]
+        for solution in transformedSolutions:
+            for node in solution["nodes"]:
+                n = self.getNodeById(node["id"])
+                keys = n.keys()
+                for interessedField in interessedFields:
+                    if interessedField in keys:
+                        node["name"] = n[interessedField]
+                if "name" not in node.keys():
+                    if len(keys) > 0:
+                        node["name"] = n[n.keys()[0]]
+                    else:
+                        node["name"] = node["id"]
+
+
+
+        return transformedSolutions
+
+
+
 if __name__ == "__main__":
     graph = Graph()
-    print graph.getKeywordNodes("to")
-    print graph.getNeighbours(50)
-    print graph.getEdge(20,79)
-    print graph.getEdgeCost(93)
+    print graph.transformToClientStructure([[520437, 412699],[412250]])

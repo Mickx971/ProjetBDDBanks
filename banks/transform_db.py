@@ -16,11 +16,12 @@ def transform_db():
     for edge in edges:
         if i % 1000 == 0:
             print i, "of 71000"
-        connection.run(''.join(["match (a) where id(a) = ",str(edge["a"]),'''  
-        match(b) where id(b) =''',str(edge["b"])," create (a)-[:",str(edge["type"]),\
+        connection.run(''.join(["start  a = NODE(",str(edge["a"]),'''), b = Node(  
+         ''',str(edge["b"]),") match (a) match (b) create (a)-[:",str(edge["type"]),\
                                 "{__weight__:a.__tempWeight__}]->(b)"]))
         i = i+1
     connection.run("match(a) set a.__tempWeight__=null")
+
     nodes = session.run('''
             MATCH (n)
             return n, keys(n) as key, ID(n) as id
@@ -44,10 +45,15 @@ def transform_db():
 
     for key in values.iterkeys():
         i = i + 1
-        statement = ''.join(["create (value:__value__{value:'", key, "'}) "])
+
         subQueryNode = list()
         subQueryMatch = list()
         subQueryCreate = list()
+
+        result = session.run(''.join(["create (value:__value__{value:'", key, "'})  return id(value) as id "]))
+        for value in result:
+            id = value["id"]
+        statement = ''.join([",value=NODE(", str(id), ") match(value) "])
         j = 0
         for node in values[key]:
             j = j + 1
@@ -55,17 +61,30 @@ def transform_db():
             variableName = "".join(["v", str(j)])
             subQueryNode.extend([variableName,"=NODE(", nodeId, "),"])
             subQueryMatch.extend([" match(", variableName, ') '])
-            subQueryCreate.extend([" create(value)-[:",node["attr"],"{value:'",key,"'}",\
-                                     "]->(", variableName, ") "])
+            subQueryCreate.extend([" create(value)-[:",node["attr"],"]->(", variableName, ") "])
+            if j%100 == 0:
+                subQueryNode = ''.join(subQueryNode)
+                subQueryMatch = ''.join(subQueryMatch)
+                subQueryCreate = ''.join(subQueryCreate)
+                subQueryNode = subQueryNode[:-1]
+                query = ''.join(["start " , subQueryNode, statement, subQueryMatch, subQueryCreate])
+                connection.run(query)
+                subQueryNode = list()
+                subQueryMatch = list()
+                subQueryCreate = list()
+
+
         subQueryNode = ''.join(subQueryNode)
         subQueryMatch = ''.join(subQueryMatch)
         subQueryCreate = ''.join(subQueryCreate)
         subQueryNode = subQueryNode[:-1]
-        query = ''.join(["start ",subQueryNode,subQueryMatch,statement,subQueryCreate])
+        query = ''.join(["start ", subQueryNode, statement, subQueryMatch, subQueryCreate])
 
         if i % 1000 == 0:
             print "query: ",i, " of ", length
-        connection.run(query)
+        if j % 100 != 0:
+            print query
+            connection.run(query)
 
 
     connection.run("match(a) where not a:__value__ set a = {}")
