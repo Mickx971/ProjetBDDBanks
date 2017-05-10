@@ -59,3 +59,7 @@ def result(request):
     	]
     }"""
     return HttpResponse(j, content_type="application/json")
+
+
+def getNoeudInfo(request):
+    return HttpResponse("information")
