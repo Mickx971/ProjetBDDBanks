@@ -15,12 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from MoteurDeRecherche.views import home, search, result, graphI
+from MoteurDeRecherche.views import home, search, result, graphI, getNoeudInfo
 
 urlpatterns = [
     #url(r'^admin/', admin.site.urls),
     url(r'^home', home),
     url(r'^search', search),
     url(r'^result', result),
-    url(r'^graphI/(?P<id>\w)/$', graphI)
+    url(r'^graphI/(?P<id>\w)/$', graphI),
+    url(r'^getNodeInfo', getNoeudInfo)
 ]
