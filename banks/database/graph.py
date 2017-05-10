@@ -54,9 +54,16 @@ class Graph:
 
     def getNbTuples(self):
         return self.numberOfNodes
+
+    def getNodeById(self,id):
+        session = self.db.getSession()
+        results = session.run("""start n = Node({nodeId}) match (n)<-[edge]-(v) 
+        where v:__value__ return type(edge) as key, v.value as value""", {"nodeId": id})
+        node = {}
+        for result in results:
+            key = str(result["key"]) if isinstance(result["key"], int) else result["key"]
+            node[key] = result["value"]
+        return node
 if __name__ == "__main__":
     graph = Graph()
-    print graph.getKeywordNodes("to")
-    print graph.getNeighbours(50)
-    print graph.getEdge(20,79)
-    print graph.getEdgeCost(93)
+    print graph.getNodeById(69521)

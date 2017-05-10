@@ -49,18 +49,18 @@ body{
 /* -------------------- For Graph ------------------- */
 
 .link {
-  stroke: #29f926;
+  stroke: #f009;
 }
 
 .node text {
-stroke: #8c000a;
+stroke: #0000;
 cursos:pointer;
 }
 
 .node circle{
-stroke: #000000;
-stroke-width:3px;
-fill:#555;
+stroke: #6973ec;
+stroke-width:5px;
+fill:#6973ec;
 }
 
 

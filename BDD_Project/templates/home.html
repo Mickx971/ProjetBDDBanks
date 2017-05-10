@@ -34,13 +34,12 @@
                         Information sur le noeud
                     </div>
                     <div class="panel-body">
-                        <table></table>
+                        <p id="info"></p>
                     </div>
                 </div>
             </div>
             <div id="result" >
-                <div id="graph">
-                </div>
+
             </div>
         </div>
 
@@ -59,15 +58,12 @@
         });
         
         window.loadInformation = function (data) {
-            //alert("test");
-            var table = document.querySelector('table');
-            var rows = '';
+            table = document.querySelector('table');
+            rows = '';
             for ( p in data) {
-              for ( k in data[p]) {
-                rows += '<tr><td>' + k + '</td><td>' + data[p][k] + '</td></tr>'
-              }
+                rows +=  '<b>'+ p + '</b> : ' + data[p] + '<br>'
             }
-            table.innerHTML = rows;
+            document.getElementById("info").innerHTML=rows;
 
             document.getElementById("information").style.visibility = "visible";
         }
@@ -79,7 +75,7 @@
                 data: ({key: $keyW }),
                 type: 'GET',
                 success: function ($data) {
-                    document.getElementById("graph").innerHTML = "";
+                    document.getElementById("result").innerHTML = '<div id="graph" class="panel panel-default"> </div>';
                     for(i=0;i<$data;i++) {
                         creatGraph(i);
                     }

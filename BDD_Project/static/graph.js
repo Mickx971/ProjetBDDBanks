@@ -65,18 +65,12 @@ function creatGraph(id) {
             });
         });
          svg.selectAll(".node").on("click", function (d) {
-             console.log(d.name);
-             var data = {
-                  "Florida": {
-                    "4079823456": "Text message content 1 here",
-                    "4079323457": "Text message content 2 here"
-                  },
-                  "Texas": {
-                    "2149823456": "Text message content 1 here"
-
-                  }
-                }
-             window.loadInformation(data);
+            var info = {}
+            $.get("/getNodeInfo/6/", function(data){
+                console.log(data);
+                info = data;
+                window.loadInformation(info);
+            });
          })
     });
 
