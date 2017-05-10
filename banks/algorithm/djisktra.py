@@ -46,6 +46,20 @@ class BANKSIterator:
             self.weight = 0
             self.leaves = leaves
 
+        def printTree(self):
+            print "Tree: "
+            for leave in self.leaves:
+                node = leave
+                spaces = ""
+                while node is not self.root:
+                    print spaces, node
+                    node = self.paths[node]
+                    spaces += "\t"
+                    if node is self.root:
+                        print spaces, node
+                        break
+
+
     def __init__(self, graph, keywordNodes):
         self.keywordNodes = keywordNodes
         self.iterators = dict()
@@ -68,7 +82,7 @@ class BANKSIterator:
         for kw in self.keywordNodes.keys():
             keywordPaths[kw] = set()
             for initialNode in self.keywordNodes[kw]:
-                keywordPaths[kw].add(self.iterators[initialNode].reached.keys())
+                keywordPaths[kw].update(self.iterators[initialNode].reached.keys())
 
         roots = keywordPaths.itervalues().next()
         for paths in keywordPaths.itervalues():
@@ -81,9 +95,9 @@ class BANKSIterator:
 
     def getKwIteratorsContainingNode(self, root):
         iterators = dict()
-        for it in self.iterators.iterkeys():
+        for it in self.iterators.itervalues():
             if root in it.reached.keys():
-                if iterators[it.keyword] is None:
+                if it.keyword not in iterators:
                     iterators[it.keyword] = list()
                 iterators[it.keyword].append(it)
         return iterators
@@ -127,7 +141,7 @@ class BANKSIterator:
         currentNode = tree.root
         while currentNode != keywordNode:
             nextNode = shortestPathsTree[currentNode]
-            tree.paths[nextNode] = nextNode
+            tree.paths[nextNode] = currentNode
             currentNode = nextNode
         tree.weight = tree.weight + shortestPathsWeight[tree.root]
 
