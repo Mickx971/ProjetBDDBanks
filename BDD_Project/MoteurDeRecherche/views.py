@@ -25,13 +25,17 @@ def search(request):
     keyword = ""
     nbrArc = 10
     treetype = True
+    time = 0
+    gen = 0
     if 'key' in request.GET:
         keyword = request.GET.get('key', '') #ici on recupere la requette rechercher
         nbrArc = request.GET.get('arc', '')
         if request.GET.get('treetype', '')== "false":
             treetype = False
+        time = ( request.GET.get('time', ''))
+        gen = (request.GET.get('gen', ''))
 
-    trees = banks.search(keyword.split(), nbrArc, strictDiff=treetype)
+    trees = banks.search(keyword.split(), nbrArc, strictDiff=treetype, generationRange=gen, generationTime=time)
     graphs = node.transformToClientStructure(trees)
 
     return HttpResponse(len(graphs), content_type="application/json")

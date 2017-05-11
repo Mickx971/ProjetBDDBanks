@@ -17,24 +17,30 @@
 
         <div id="KeyWordSearch" class="searching">
             <h3>Keyword Search In Graph DB</h3>
-            <form  role="search" method="GET" action="/search/" class="form-inline">
+            <form  role="search" method="GET" action="/search/" >
 
                 {% csrf_token %}
 
                 <div class="input-group">
                     <input class="form-control" placeholder="Search ..." name="keyword" id="keyword" type="text" aria-describedby="sizing-addon1"><br>
-
                     <div class="input-group-btn">
                         <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
                     </div>
-
                 </div>
+                    <br>
+                <div class="form-inline">
+                    <label for="nbrArc"> Nombre d'arc :</label>
+                    <input type="number" id="nbrArc" min="1" value="10" class="form-control"/>
 
-                <label for="nbrArc"> Nombre d'arc :</label>
-                <input type="number" id="nbrArc" min="1" value="10"/>
+                    <label for="time">temps d'une generation :</label>
+                    <input type="number"  id="time" min="1" value="1" class="form-control"/>
 
-                <label for="treetype">Meme racine :</label>
-                <input type="checkbox"  id="treetype" checked/>
+                    <label for="gen">taille d'une generation :</label>
+                    <input type="number"  id="gen" min="1" value="10" class="form-control"/>
+
+                    <label for="treetype">Meme racine :</label>
+                    <input type="checkbox"  id="treetype" checked/>
+                </div>
             </form>
 
             <div class="information" id="information">
@@ -83,7 +89,9 @@
                 url: '/search',
                 data: ({key: $keyW,
                         arc : $("#nbrArc").val(),
-                        tree: $("#treetype").is(':checked')
+                        tree: $("#treetype").is(':checked'),
+                        time : $("#time").val(),
+                        gen : $("#gen").val()
                         }),
                 type: 'GET',
                 success: function ($data) {
