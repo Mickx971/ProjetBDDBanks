@@ -89,9 +89,9 @@
                 success: function ($data) {
                     document.getElementById("result").innerHTML = '<div id="graph" class="panel panel-default"> </div>';
                     for(i=0;i<$data;i++) {
-                        creatGraph(i);
+                        createGraph2(i);
                     }
-
+                    //createGraph2();
                 }
             });
             return false;

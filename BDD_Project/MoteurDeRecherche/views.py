@@ -43,7 +43,7 @@ def search(request):
     ]
     }"""
 
-    trees = banks.search(keyword.split(), nbrArc, strictDiff=treetype)
+    trees = banks.search(keyword.split(), nbrArc, strictDiff=True)
     graphs = node.transformToClientStructure(trees)
     print len(graphs)
 
