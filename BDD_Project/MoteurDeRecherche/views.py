@@ -28,24 +28,11 @@ def search(request):
     if 'key' in request.GET:
         keyword = request.GET.get('key', '') #ici on recupere la requette rechercher
         nbrArc = request.GET.get('arc', '')
-        treetype = request.GET.get('treetype', '')
+        if request.GET.get('treetype', '')== "false":
+            treetype = False
 
-    j = """{
-    "nodes":[
-        {"name":"keyword","group":1,"info":" la requeste chercher"},
-        {"name":"Toufik","group":2,"info":" la requeste cherchefqsdfr"},
-        {"name":"Mickix","group":3},
-        {"name":"Ahmed","group":1}
-    ],
-    "links":[
-        {"source":2,"target":1,"weight":1},
-        {"source":0,"target":2,"weight":3}
-    ]
-    }"""
-
-    trees = banks.search(keyword.split(), nbrArc, strictDiff=True)
+    trees = banks.search(keyword.split(), nbrArc, strictDiff=treetype)
     graphs = node.transformToClientStructure(trees)
-    print len(graphs)
 
     return HttpResponse(len(graphs), content_type="application/json")
 

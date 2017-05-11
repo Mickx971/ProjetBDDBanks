@@ -31,10 +31,10 @@
                 </div>
 
                 <label for="nbrArc"> Nombre d'arc :</label>
-                <input type="number" id="nbrArc" />
+                <input type="number" id="nbrArc" min="1" value="10"/>
 
                 <label for="treetype">Meme racine :</label>
-                <input type="checkbox"  id="treetype"/>
+                <input type="checkbox"  id="treetype" checked/>
             </form>
 
             <div class="information" id="information">
@@ -88,10 +88,13 @@
                 type: 'GET',
                 success: function ($data) {
                     document.getElementById("result").innerHTML = '<div id="graph" class="panel panel-default"> </div>';
-                    for(i=0;i<$data;i++) {
-                        createGraph2(i);
+                    if($data==0){
+                        alert("Aucune information");
+                    }else{
+                        for(i=0;i<$data;i++) {
+                            createGraph2(i);
+                        }
                     }
-                    //createGraph2();
                 }
             });
             return false;
