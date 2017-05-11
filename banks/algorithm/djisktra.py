@@ -19,6 +19,7 @@ class BANKSIterator:
 
         def addEdge(self, edge):
             self.edges.add(edge)
+            self.paths[edge.n2] = edge.n1
 
         def getEgdeIDs(self):
             return map(lambda edge: edge.id, self.edges)
@@ -111,13 +112,16 @@ class BANKSIterator:
                     return edge
             return None
 
-
-    def __init__(self, graph, keywordNodes, strictDiff=False):
+    def __init__(self, graph, keywordNodes, strictDiff=False, generationRange=10, generationTime=1):
         self.keywordNodes = keywordNodes
         self.iterators = dict()
         self.roots = set()
         self.trees = list()
         self.strictDiff = strictDiff
+        self.graph = graph
+        self.searchCounter = 0
+        self.generationRange = generationRange
+        self.generationTime = generationTime
         nbTuples = graph.getNbTuples()
         for kw in self.keywordNodes.keys():
             for initialNode in self.keywordNodes[kw]:
@@ -127,9 +131,18 @@ class BANKSIterator:
         self.strictDiff = setStrict
 
     def next(self):
+        self.searchCounter = self.searchCounter + 1
         haveChanged = False
-        for it in self.iterators.values():
-            haveChanged = it.next() or haveChanged
+        for kw in self.keywordNodes.keys():
+
+            nodes = self.keywordNodes[kw]
+
+            startIteratorIndex = ((self.searchCounter / self.generationTime) * self.generationRange) % len(nodes)
+            endIteratorIndex = min(len(nodes), startIteratorIndex + self.generationRange)
+
+            for i in range(startIteratorIndex, endIteratorIndex):
+                haveChanged = self.iterators[nodes[i]].next() or haveChanged
+
         return haveChanged
 
     def findRoots(self):
@@ -212,7 +225,6 @@ class BANKSIterator:
 
         while currentNode != keywordNode:
             nextNode = shortestPathsTree[currentNode]
-            tree.paths[nextNode] = currentNode
             tree.addEdge(it.getEdge(currentNode, nextNode))
             currentNode = nextNode
         tree.weight = tree.weight + shortestPathsWeight[tree.root]
@@ -220,6 +232,15 @@ class BANKSIterator:
     def getTrees(self):
         return self.trees
 
+    def getSimpleTrees(self):
+        for node in [n for l in self.keywordNodes.values() for n in l]:
+            tree = BANKSIterator.Tree(node, self.graph.getNeighbours(node))
+            if len(tree.leaves) > 0:
+                self.trees.append(tree)
+                for n in tree.leaves:
+                    edge = self.graph.getEdge(node, n)
+                    tree.addEdge(BANKSIterator.Edge(edge, node, n))
+        return self.trees
 
 def computeNbTrees(map):
     if len(map) == 0:
