@@ -16,25 +16,36 @@ class GenericBANKS:
                 keywordNodes.pop(kw, None)
         return BANKSIterator(self.graph, keywordNodes)
 
-    def search(self, keywords, maxResult=30, maxTime=30, strictDiff=False):
+    def search(self, keywords, maxResult=30, maxTime=30, strictDiff=False, generationRange=10, generationTime=1):
         print "Start: ", time.strftime('%H:%M:%S %Y/%m/%d', time.localtime())
-
-        start = time.time()
 
         banksIt = self.createSearchIterator(keywords)
         banksIt.setStrict(strictDiff)
+        banksIt.setGenerationTime(generationTime)
+        banksIt.setGenerationRange(generationRange)
+        
+        trees = []
 
-        while time.time() - start < maxTime and banksIt.next() and banksIt.getNbTrees() <= maxResult:
-            banksIt.findRoots()
-            banksIt.constructTrees()
+        if len(banksIt.keywordNodes) > 1:
+            start = time.time()
+
+            while time.time() - start < maxTime and banksIt.next() and banksIt.getNbTrees() <= maxResult:
+                banksIt.findRoots()
+                banksIt.constructTrees()
+
+            trees = banksIt.getTrees()
+
+        if len(trees) == 0:
+            trees = banksIt.getSimpleTrees()
 
         print "End: ", time.strftime('%H:%M:%S %Y/%m/%d'), "\n"
-        return map(lambda t: t.getEgdeIDs(), banksIt.getTrees())
+
+        return map(lambda t: t.getEgdeIDs(), trees)
 
 
 if __name__ == '__main__':
     banks = GenericBANKS()
-    trees = banks.search(["Busta Rhymes", "Cube Zero", "273", "76U87JFUTVUYJBGIVF"], 10, strictDiff=True)
+    trees = banks.search(["Busta Rhymes", "Drama"], maxResult=10, maxTime=5, strictDiff=True)
     for tree in trees:
         print tree
 
