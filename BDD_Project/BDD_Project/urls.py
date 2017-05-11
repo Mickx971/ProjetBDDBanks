@@ -22,6 +22,6 @@ urlpatterns = [
     url(r'^home', home),
     url(r'^search', search),
     url(r'^result', result),
-    url(r'^graphI/(?P<id>\w)/$', graphI),
+    url(r'^graphI/(?P<id>[0-9]+)/$', graphI),
     url(r'^getNodeInfo/(?P<idnode>[0-9]+)/$', getNoeudInfo)
 ]

@@ -22,13 +22,13 @@ def search(request):
     global graphs
     global node
     global banks
-    keyword=""
+    keyword = ""
+    nbrArc = 10
+    treetype = True
     if 'key' in request.GET:
         keyword = request.GET.get('key', '') #ici on recupere la requette rechercher
-
-        # Code a ajouter pour faire une recherche dans La DB Graph
-        # ..
-        # ..
+        nbrArc = request.GET.get('arc', '')
+        treetype = request.GET.get('treetype', '')
 
     j = """{
     "nodes":[
@@ -43,8 +43,9 @@ def search(request):
     ]
     }"""
 
-    trees = banks.search(keyword.split(), 10, strictDiff=True)
+    trees = banks.search(keyword.split(), nbrArc, strictDiff=treetype)
     graphs = node.transformToClientStructure(trees)
+    print len(graphs)
 
     return HttpResponse(len(graphs), content_type="application/json")
 
