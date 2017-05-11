@@ -130,6 +130,12 @@ class BANKSIterator:
     def setStrict(self, setStrict):
         self.strictDiff = setStrict
 
+    def setGenerationTime(self, generationTime):
+        self.generationTime = generationTime
+
+    def setGenerationRange(self, generationRange):
+        self.generationRange = generationRange
+
     def next(self):
         self.searchCounter = self.searchCounter + 1
         haveChanged = False

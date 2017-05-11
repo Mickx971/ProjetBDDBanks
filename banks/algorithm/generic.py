@@ -16,11 +16,14 @@ class GenericBANKS:
                 keywordNodes.pop(kw, None)
         return BANKSIterator(self.graph, keywordNodes)
 
-    def search(self, keywords, maxResult=30, maxTime=30, strictDiff=False):
+    def search(self, keywords, maxResult=30, maxTime=30, strictDiff=False, generationRange=10, generationTime=1):
         print "Start: ", time.strftime('%H:%M:%S %Y/%m/%d', time.localtime())
 
         banksIt = self.createSearchIterator(keywords)
         banksIt.setStrict(strictDiff)
+        banksIt.setGenerationTime(generationTime)
+        banksIt.setGenerationRange(generationRange)
+        
         trees = []
 
         if len(banksIt.keywordNodes) > 1:
