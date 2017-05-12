@@ -18,7 +18,9 @@ class Graph:
     def getKeywordNodes(self, kw):
         valueNode=None
         session = self.db.getSession()
-        result = session.run("match(a:__value__) where a.value = {value} return distinct id(a) as id", {"value": kw})
+        result = session.run("""match(a) where a:__value__ and lower({value}) in
+        (split(lower(a.value), " "))
+        return id(a) as id ,length(split(lower(a.value), " ")) as s order By s""", {"value": kw})
         for node in result:
             valueNode = node["id"]
 

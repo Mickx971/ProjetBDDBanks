@@ -41,6 +41,8 @@ def search(request):
     trees = banks.search([w.strip() for w in keyword.split(",")], maxResult=nbrArc, maxTime=timeSearch, strictDiff=treetype, generationRange=gen, generationTime=time)
     graphs = node.transformToClientStructure(trees)
     #search(self, keywords, maxResult=30, maxTime=30, strictDiff=False, generationRange=10, generationTime=1):
+    print len(graphs)
+    print keyword
     return HttpResponse(len(graphs), content_type="application/json")
 
 def graphI(request, id):
