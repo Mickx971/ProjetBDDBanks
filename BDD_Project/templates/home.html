@@ -103,6 +103,9 @@
                     if($data==0){
                         alert("Aucune information");
                     }else{
+                        if($data>50){
+                            $data=50;
+                        }
                         for(i=0;i<$data;i++) {
                             createGraph2(i);
                         }
