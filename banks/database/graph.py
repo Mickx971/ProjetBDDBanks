@@ -16,15 +16,18 @@ class Graph:
         return neighbors
 
     def getKeywordNodes(self, kw):
-        valueNode=None
+        valueNode = []
         session = self.db.getSession()
-        result = session.run("""match(a) where a:__value__ and lower({value}) in
-        (split(lower(a.value), " "))
-        return id(a) as id ,length(split(lower(a.value), " ")) as s order By s""", {"value": kw})
+        result = session.run("""match(a) where a:__value__ and lower({value}) in 
+                (split(lower(a.value), " ")) 
+                return id(a) as id ,length(split(lower(a.value), " ")) as s order By s""", {"value": kw})
         for node in result:
-            valueNode = node["id"]
+            valueNode.append(node["id"])
 
-        return [] if (valueNode is None) else self.getNeighbours(valueNode)
+        keywordNodes = []
+        for node in valueNode:
+            keywordNodes.extend(self.getNeighbours(node))
+        return keywordNodes
 
 
     def getEdge(self, fromNode, toNode):
