@@ -7,6 +7,7 @@ import datetime
 import json
 from banks.database import graph
 from banks.algorithm.generic import GenericBANKS
+import unicodedata
 
 graphs =""
 node = graph.Graph()
@@ -27,17 +28,19 @@ def search(request):
     treetype = True
     time = 0
     gen = 0
+    timeSearch = 0
     if 'key' in request.GET:
-        keyword = request.GET.get('key', '') #ici on recupere la requette rechercher
+        keyword = request.GET.get('key', '')  #ici on recupere la requette rechercher
         nbrArc = request.GET.get('arc', '')
         if request.GET.get('treetype', '')== "false":
             treetype = False
-        time = ( request.GET.get('time', ''))
-        gen = (request.GET.get('gen', ''))
+        time = int( request.GET.get('time', ''))
+        gen = int(request.GET.get('gen', ''))
+        timeSearch = int( request.GET.get('timeSearch', ''))
 
-    trees = banks.search(keyword.split(), nbrArc, strictDiff=treetype, generationRange=gen, generationTime=time)
+    trees = banks.search([w.strip() for w in keyword.split(",")], maxResult=nbrArc, maxTime=timeSearch, strictDiff=treetype, generationRange=gen, generationTime=time)
     graphs = node.transformToClientStructure(trees)
-
+    #search(self, keywords, maxResult=30, maxTime=30, strictDiff=False, generationRange=10, generationTime=1):
     return HttpResponse(len(graphs), content_type="application/json")
 
 def graphI(request, id):

@@ -29,7 +29,10 @@
                 </div>
                     <br>
                 <div class="form-inline">
-                    <label for="nbrArc"> Nombre d'arc :</label>
+                    <label for="nbrArc"> Temps de recherche :</label>
+                    <input type="number" id="tmpSearch" min="1" value="10" class="form-control"/>
+
+                    <label for="nbrArc"> Nbr resultats :</label>
                     <input type="number" id="nbrArc" min="1" value="10" class="form-control"/>
 
                     <label for="time">temps d'une generation :</label>
@@ -38,7 +41,7 @@
                     <label for="gen">taille d'une generation :</label>
                     <input type="number"  id="gen" min="1" value="10" class="form-control"/>
 
-                    <label for="treetype">Meme racine :</label>
+                    <label for="treetype">Arbres minimaux :</label>
                     <input type="checkbox"  id="treetype" checked/>
                 </div>
             </form>
@@ -91,7 +94,8 @@
                         arc : $("#nbrArc").val(),
                         tree: $("#treetype").is(':checked'),
                         time : $("#time").val(),
-                        gen : $("#gen").val()
+                        gen : $("#gen").val(),
+                        timeSearch : $("#tmpSearch").val()
                         }),
                 type: 'GET',
                 success: function ($data) {
