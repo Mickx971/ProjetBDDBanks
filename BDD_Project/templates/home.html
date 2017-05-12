@@ -86,6 +86,11 @@
             document.getElementById("information").style.visibility = "visible";
         }
 
+        window.hideInformation = function() {
+            console.log("hiiden");
+            document.getElementById("information").style.visibility = "hidden";
+        }
+
         function getKeyword() {
             $keyW = $("#keyword").val();
             $.ajax({
@@ -115,6 +120,7 @@
             return false;
         }
 
+        $("body").click( window.hideInformation );
     </script>
 
 </body>
